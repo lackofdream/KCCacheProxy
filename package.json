@@ -72,7 +72,8 @@
     "fs-extra": "^9.0.1",
     "http-proxy": "^1.18.1",
     "node-fetch": "^2.6.1",
-    "node-stream-zip": "^1.11.3"
+    "node-stream-zip": "^1.11.3",
+    "socks-proxy-agent": "^5.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.53",

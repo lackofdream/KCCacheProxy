@@ -45,7 +45,8 @@ const defaultConfig = {
         },
         "cleanup": true
     },
-    "configVersion": 3
+    "configVersion": 3,
+    "socks_proxy": ""
 }
 
 /** @typedef {defaultConfig} config */

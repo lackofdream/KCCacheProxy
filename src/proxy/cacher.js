@@ -2,6 +2,7 @@ const fetch = require("node-fetch")
 const { dirname, join } = require("path")
 const { ensureDir, existsSync, exists, rename, unlink, readFileSync, readFile, writeFile } = require("fs-extra")
 const { promisify } = require("util")
+const SocksProxyAgent = require('socks-proxy-agent');
 
 /** @typedef {import("http").IncomingMessage} IncomingMessage */
 /** @typedef {import("http").ServerResponse} ServerResponse */
@@ -109,6 +110,9 @@ async function cache(cacheFile, file, url, version, lastmodified, headers = {}) 
     else
         delete options.headers["If-Modified-Since"]
 
+    if (getConfig().socks_proxy) {
+        options['agent'] = new SocksProxyAgent(getConfig().socks_proxy)
+    }
 
     // Fetch data
     let data
