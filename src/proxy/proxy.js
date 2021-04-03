@@ -15,7 +15,11 @@ const KC_PATHS = ["/kcs/", "/kcs2/", "/kcscontents/", "/gadget_html5/", "/html/"
 
 const proxy = createProxyServer()
 const server = createServer(async (req, res) => {
-    const { method, url } = req
+    let { method, url } = req
+
+    if (!url.startsWith("http")) {
+        url = `http://${req.headers.host}${url}`
+    }
 
     Logger.log(`${method}: ${url}`)
     Logger.send("help", "connected")
@@ -46,6 +50,23 @@ server.on("connect", (req, socket) => {
     Logger.log(`${req.method}: ${req.url}`)
     Logger.addStatAndSend("passthroughHTTPS")
     Logger.addStatAndSend("passthrough")
+
+    const targetPort = parseInt(req.url.split(":")[1])
+
+    if (targetPort === 80) {
+        Logger.log("Assuming CONNECT is plain HTTP tunneling")
+
+        socket.write("HTTP/1.1 200 Connection Established\r\n" +
+            "Proxy-agent: Node-Proxy\r\n" +
+            "\r\n")
+
+        const srvSocket = connect(port, hostname, () => {
+            srvSocket.pipe(socket)
+            socket.pipe(srvSocket)
+        })
+        srvSocket.on("error", (...a) => Logger.error("Server socket error", ...a))
+        return
+    }
 
     socket.on("error", (...a) => Logger.error("Socket error", ...a))
 
